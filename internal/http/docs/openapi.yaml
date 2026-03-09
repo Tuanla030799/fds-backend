@@ -1,0 +1,93 @@
+openapi: 3.0.3
+info:
+  title: FDS Backend API
+  version: 1.0.0
+servers:
+  - url: /api
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    ErrorEnvelope:
+      type: object
+      properties:
+        success: { type: boolean, example: false }
+        message: { type: string }
+        requestId: { type: string }
+        error:
+          type: object
+          properties:
+            code: { type: string }
+            message: { type: string }
+            details: {}
+paths:
+  /health:
+    get:
+      summary: Health check
+      responses:
+        '200': { description: OK }
+  /admin/auth/login:
+    post:
+      summary: Login admin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email: { type: string }
+                password: { type: string }
+      responses:
+        '200': { description: Logged in }
+  /admin/auth/refresh:
+    post:
+      summary: Refresh token
+      responses:
+        '200': { description: Refreshed }
+  /design-submissions:
+    post:
+      summary: Create design submission
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [fullName, address, phone, image]
+              properties:
+                fullName: { type: string }
+                address: { type: string }
+                phone: { type: string }
+                note: { type: string }
+                image: { type: string, format: binary }
+      responses:
+        '201': { description: Created }
+  /admin/design-submissions:
+    get:
+      summary: List design submissions
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - in: query
+          name: page
+          schema: { type: integer }
+        - in: query
+          name: limit
+          schema: { type: integer }
+        - in: query
+          name: keyword
+          schema: { type: string }
+        - in: query
+          name: status
+          schema: { type: string }
+      responses:
+        '200': { description: OK }
+  /presets:
+    get:
+      summary: List presets
+      responses:
+        '200': { description: OK }

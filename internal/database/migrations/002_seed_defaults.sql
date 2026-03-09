@@ -1,0 +1,2 @@
+-- production seed placeholder
+-- insert initial admin and optional demo data outside application runtime if desired
