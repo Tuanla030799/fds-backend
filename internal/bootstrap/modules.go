@@ -1,6 +1,7 @@
 package bootstrap
 
 import (
+	"fds-backend/internal/modulekit"
 	"fds-backend/internal/modules/adminauth"
 	designsubmissionmodule "fds-backend/internal/modules/designsubmission"
 	"fds-backend/internal/modules/health"
@@ -8,6 +9,12 @@ import (
 	"fds-backend/internal/modules/swagger"
 )
 
-func DefaultModules() []Module {
-	return []Module{health.NewModule(), swagger.NewModule(), adminauth.NewModule(), designsubmissionmodule.NewModule(), presetmodule.NewModule()}
+func DefaultModules() []modulekit.Module {
+	return []modulekit.Module{
+		health.NewModule(),
+		swagger.NewModule(),
+		adminauth.NewModule(),
+		designsubmissionmodule.NewModule(),
+		presetmodule.NewModule(),
+	}
 }
