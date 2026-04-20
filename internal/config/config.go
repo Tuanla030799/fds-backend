@@ -19,7 +19,6 @@ type Config struct {
 	Pagination PaginationConfig
 	Security   SecurityConfig
 	Seed       SeedConfig
-	Storage    StorageConfig
 }
 
 type AppConfig struct {
@@ -53,6 +52,7 @@ type UploadConfig struct {
 	AllowedExts    []string
 	PresetsSubdir  string
 	OrdersSubdir   string
+	TempSubdir     string
 	PublicBasePath string
 }
 
@@ -74,15 +74,6 @@ type SeedConfig struct {
 	CreateDemo    bool
 }
 
-type StorageConfig struct {
-	Driver       string
-	S3Bucket     string
-	S3Region     string
-	S3Endpoint   string
-	S3PublicBase string
-	S3ForcePath  bool
-}
-
 func Load() (*Config, error) {
 	_ = godotenv.Load()
 	cfg := &Config{
@@ -90,11 +81,10 @@ func Load() (*Config, error) {
 		Database:   DatabaseConfig{URL: getEnv("DATABASE_URL", "postgres://postgres:postgres@localhost:5432/fds?sslmode=disable"), MaxIdleConns: getEnvInt("DB_MAX_IDLE_CONNS", 10), MaxOpenConns: getEnvInt("DB_MAX_OPEN_CONNS", 50), ConnMaxLifetime: time.Duration(getEnvInt("DB_CONN_MAX_LIFETIME_MINUTES", 30)) * time.Minute, AutoMigrate: getEnvBool("DB_AUTO_MIGRATE", true)},
 		JWT:        JWTConfig{Secret: getEnv("JWT_SECRET", "change-me-now"), AccessTokenTTL: time.Duration(getEnvInt("JWT_ACCESS_TTL_HOURS", 24)) * time.Hour, RefreshTokenTTL: time.Duration(getEnvInt("JWT_REFRESH_TTL_HOURS", 24*30)) * time.Hour, RefreshTokenAudience: getEnv("JWT_REFRESH_AUDIENCE", "admin-refresh")},
 		CORS:       CORSConfig{Origins: parseCSV(getEnv("CORS_ORIGINS", "http://localhost:5173,http://localhost:3000"))},
-		Upload:     UploadConfig{Dir: getEnv("UPLOADS_DIR", "./uploads"), MaxBytes: int64(getEnvInt("UPLOAD_MAX_BYTES", 20<<20)), AllowedMime: parseCSV(getEnv("UPLOAD_ALLOWED_MIME", "image/png,image/jpeg,image/webp")), AllowedExts: parseCSV(getEnv("UPLOAD_ALLOWED_EXTS", ".png,.jpg,.jpeg,.webp")), PresetsSubdir: getEnv("UPLOAD_PRESETS_SUBDIR", "presets"), OrdersSubdir: getEnv("UPLOAD_ORDERS_SUBDIR", "design-submissions"), PublicBasePath: getEnv("UPLOAD_PUBLIC_BASE_PATH", "/uploads")},
+		Upload:     UploadConfig{Dir: getEnv("UPLOADS_DIR", "./uploads"), MaxBytes: int64(getEnvInt("UPLOAD_MAX_BYTES", 20<<20)), AllowedMime: parseCSV(getEnv("UPLOAD_ALLOWED_MIME", "image/png,image/jpeg,image/webp")), AllowedExts: parseCSV(getEnv("UPLOAD_ALLOWED_EXTS", ".png,.jpg,.jpeg,.webp")), PresetsSubdir: getEnv("UPLOAD_PRESETS_SUBDIR", "presets"), OrdersSubdir: getEnv("UPLOAD_ORDERS_SUBDIR", "design-submissions"), TempSubdir: getEnv("UPLOAD_TEMP_SUBDIR", "tmp"), PublicBasePath: getEnv("UPLOAD_PUBLIC_BASE_PATH", "/uploads")},
 		Pagination: PaginationConfig{DefaultLimit: getEnvInt("PAGINATION_DEFAULT_LIMIT", 20), MaxLimit: getEnvInt("PAGINATION_MAX_LIMIT", 100)},
 		Security:   SecurityConfig{LoginRateLimitPerMinute: getEnvInt("RATE_LIMIT_LOGIN_PER_MINUTE", 10), UploadRateLimitPerMinute: getEnvInt("RATE_LIMIT_UPLOAD_PER_MINUTE", 30), TrustedProxies: parseCSV(getEnv("TRUSTED_PROXIES", ""))},
 		Seed:       SeedConfig{AdminEmail: getEnv("ADMIN_SEED_EMAIL", "admin@fds.local"), AdminPassword: getEnv("ADMIN_SEED_PASSWORD", "12345678"), AdminName: getEnv("ADMIN_SEED_NAME", "System Admin"), CreateDemo: getEnvBool("SEED_DEMO_DATA", true)},
-		Storage:    StorageConfig{Driver: getEnv("STORAGE_DRIVER", "local"), S3Bucket: getEnv("S3_BUCKET", ""), S3Region: getEnv("S3_REGION", ""), S3Endpoint: getEnv("S3_ENDPOINT", ""), S3PublicBase: getEnv("S3_PUBLIC_BASE_URL", ""), S3ForcePath: getEnvBool("S3_FORCE_PATH_STYLE", true)},
 	}
 	return cfg, cfg.Validate()
 }
@@ -112,12 +102,6 @@ func (c *Config) Validate() error {
 	}
 	if c.Upload.MaxBytes <= 0 {
 		issues = append(issues, "UPLOAD_MAX_BYTES must be positive")
-	}
-	if c.Storage.Driver != "local" && c.Storage.Driver != "s3" {
-		issues = append(issues, "STORAGE_DRIVER must be local or s3")
-	}
-	if c.Storage.Driver == "s3" && c.Storage.S3Bucket == "" {
-		issues = append(issues, "S3_BUCKET is required when STORAGE_DRIVER=s3")
 	}
 	if len(issues) > 0 {
 		return fmt.Errorf("invalid config: %s", strings.Join(issues, "; "))

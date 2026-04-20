@@ -10,7 +10,7 @@ Backend Golang cho FDS theo hướng mở rộng module, gồm 15 nhóm nền t�
 7. RBAC role-based access
 8. soft delete
 9. search/filter/sort chuẩn
-10. storage strategy abstraction (local + s3 scaffold)
+10. storage abstraction
 11. OpenAPI/Swagger yaml
 12. tests scaffold
 13. seed data
@@ -42,6 +42,16 @@ Quy ước file:
 - `.env`: bản local để chạy `go run`, dùng `DATABASE_URL=...@localhost...`
 - `.env.server`: bản cho Docker/server, dùng `DATABASE_URL=...@db...`
 
+## Files Upload
+
+- `POST /api/files/upload`
+- `multipart/form-data` gồm `file` và `folder`
+- `folder` cho phép: `tmp`, `presets`, `design-submissions`
+- file mới tạo record trong bảng `files` với status `UNACTIVE`
+- mỗi user chỉ upload tối đa `20` ảnh/phút, riêng `super_admin` được bỏ qua limit
+- khi tạo preset hoặc design submission với `fileId`, backend sẽ đổi status file sang `ACTIVE`
+- cron job nền xóa file `UNACTIVE` quá `10` phút kể từ `created_at`
+
 ## Main endpoints
 
 - `POST /api/admin/auth/register`
@@ -65,6 +75,6 @@ Quy ước file:
 
 ## Notes
 - Local storage chạy ngay được.
-- S3 đã có abstraction để mở rộng, file driver `s3.go` hiện là scaffold để nối SDK sau.
+- File hiện được lưu local qua `Storage` abstraction để sau này vẫn có thể thay backend lưu trữ khác nếu cần.
 - AutoMigrate đang bật để dev nhanh; production nên đổi sang migration runner riêng.
 # fds-backend

@@ -4,19 +4,35 @@ import (
 	"errors"
 	"strings"
 
+	"fds-backend/internal/domain/fileasset"
 	"fds-backend/internal/shared/apperrors"
 	"fds-backend/internal/shared/pagination"
 	"fds-backend/internal/shared/query"
+	"fds-backend/internal/shared/tx"
 	"fds-backend/internal/shared/validation"
 
 	"gorm.io/gorm"
 )
 
-type Service struct{ repo Repository }
+type Service struct {
+	repo  Repository
+	db    *gorm.DB
+	files *fileasset.Service
+}
 
-func NewService(repo Repository) *Service { return &Service{repo: repo} }
+func NewService(repo Repository, db *gorm.DB, files *fileasset.Service) *Service {
+	return &Service{repo: repo, db: db, files: files}
+}
 
-type CreateInput struct{ FullName, Address, Phone, Note, ImageURL string }
+type CreateInput struct {
+	FullName string
+	Address  string
+	Phone    string
+	Note     string
+	ImageURL string
+	FileID   string
+	ActorID  string
+}
 
 func (s *Service) Create(input CreateInput) (*Submission, error) {
 	if err := validation.Required(input.FullName, "fullName"); err != nil {
@@ -28,11 +44,35 @@ func (s *Service) Create(input CreateInput) (*Submission, error) {
 	if err := validation.Phone(input.Phone); err != nil {
 		return nil, err
 	}
-	if err := validation.Required(input.ImageURL, "image"); err != nil {
+	if strings.TrimSpace(input.ImageURL) == "" && strings.TrimSpace(input.FileID) == "" {
+		return nil, apperrors.BadRequest("image or fileId is required")
+	}
+	item := &Submission{
+		FullName: strings.TrimSpace(input.FullName),
+		Address:  strings.TrimSpace(input.Address),
+		Phone:    strings.TrimSpace(input.Phone),
+		Note:     strings.TrimSpace(input.Note),
+		Status:   StatusPending,
+	}
+	err := tx.Within(s.db, func(txx *gorm.DB) error {
+		if strings.TrimSpace(input.FileID) != "" {
+			if s.files == nil {
+				return apperrors.BadRequest("file service is unavailable")
+			}
+			file, err := s.files.ActivateForUseTx(txx, input.FileID, input.ActorID)
+			if err != nil {
+				return err
+			}
+			item.ImageURL = file.Path
+		} else {
+			item.ImageURL = strings.TrimSpace(input.ImageURL)
+		}
+		return s.repo.CreateTx(txx, item)
+	})
+	if err != nil {
 		return nil, err
 	}
-	item := &Submission{FullName: strings.TrimSpace(input.FullName), Address: strings.TrimSpace(input.Address), Phone: strings.TrimSpace(input.Phone), Note: strings.TrimSpace(input.Note), ImageURL: strings.TrimSpace(input.ImageURL), Status: StatusPending}
-	return item, s.repo.Create(item)
+	return item, nil
 }
 func (s *Service) List(filters query.Filters, sort query.Sort, params pagination.Params) ([]Submission, int64, error) {
 	return s.repo.List(filters, sort, params)

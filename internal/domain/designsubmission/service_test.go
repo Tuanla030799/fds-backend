@@ -5,11 +5,14 @@ import (
 
 	"fds-backend/internal/shared/pagination"
 	"fds-backend/internal/shared/query"
+
+	"gorm.io/gorm"
 )
 
 type stubRepo struct{}
 
 func (s stubRepo) Create(item *Submission) error { return nil }
+func (s stubRepo) CreateTx(_ *gorm.DB, item *Submission) error { return nil }
 func (s stubRepo) List(filters query.Filters, sort query.Sort, params pagination.Params) ([]Submission, int64, error) {
 	return nil, 0, nil
 }

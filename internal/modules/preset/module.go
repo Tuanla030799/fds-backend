@@ -1,7 +1,10 @@
 package presetmodule
 
 import (
+	"time"
+
 	"fds-backend/internal/domain/admin"
+	"fds-backend/internal/domain/fileasset"
 	"fds-backend/internal/domain/preset"
 	"fds-backend/internal/http/handlers"
 	"fds-backend/internal/http/middleware"
@@ -15,7 +18,8 @@ func (m *Module) Name() string { return "preset" }
 
 func (m *Module) Register(reg *modulekit.Registry) error {
 	repo := preset.NewGormRepository(reg.DB)
-	service := preset.NewService(repo)
+	fileService := fileasset.NewService(fileasset.NewGormRepository(reg.DB), reg.Providers.Storage, 10*time.Minute)
+	service := preset.NewService(repo, reg.DB, fileService)
 	h := handlers.NewPresetHandler(
 		service,
 		reg.Providers.Storage,

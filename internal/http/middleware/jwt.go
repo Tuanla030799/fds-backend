@@ -36,6 +36,33 @@ func NewJWTMiddleware(jwtManager *auth.JWTManager) gin.HandlerFunc {
 	}
 }
 
+func NewOptionalJWTMiddleware(jwtManager *auth.JWTManager) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		header := c.GetHeader("Authorization")
+		if header == "" {
+			c.Next()
+			return
+		}
+		if !strings.HasPrefix(header, "Bearer ") {
+			response.AbortWithError(c, apperrors.Unauthorized("missing bearer token"))
+			return
+		}
+		claims, err := jwtManager.Parse(strings.TrimPrefix(header, "Bearer "))
+		if err != nil {
+			response.AbortWithError(c, apperrors.Unauthorized("invalid token"))
+			return
+		}
+		c.Set("jwtClaims", claims)
+		if sub, ok := claims["sub"].(string); ok {
+			c.Set("admin_id", sub)
+		}
+		if role, ok := claims["role"].(string); ok {
+			c.Set("admin_role", role)
+		}
+		c.Next()
+	}
+}
+
 func RequireRoles(roles ...admin.Role) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		current := c.GetString("admin_role")

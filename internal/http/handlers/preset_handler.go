@@ -58,6 +58,7 @@ func (h *PresetHandler) AdminCreate(c *gin.Context) {
 	name := strings.TrimSpace(c.PostForm("name"))
 	note := strings.TrimSpace(c.PostForm("note"))
 	status := preset.Status(strings.TrimSpace(c.DefaultPostForm("status", string(preset.StatusActive))))
+	fileID := strings.TrimSpace(c.PostForm("fileId"))
 	tags := strings.Split(strings.TrimSpace(c.DefaultPostForm("tags", "")), ",")
 	sortOrder, _ := strconv.Atoi(c.DefaultPostForm("sortOrder", "0"))
 	cleanTags := make([]string, 0, len(tags))
@@ -67,21 +68,24 @@ func (h *PresetHandler) AdminCreate(c *gin.Context) {
 			cleanTags = append(cleanTags, tag)
 		}
 	}
-	file, err := c.FormFile("image")
-	if err != nil {
-		writeError(c, apperrors.BadRequest("image is required"))
-		return
+	imageURL := ""
+	if fileID == "" {
+		file, err := c.FormFile("image")
+		if err != nil {
+			writeError(c, apperrors.BadRequest("image or fileId is required"))
+			return
+		}
+		if err := validation.UploadFile(file, h.cfg.Upload.AllowedExts, h.cfg.Upload.MaxBytes); err != nil {
+			writeError(c, err)
+			return
+		}
+		imageURL, err = h.storage.Save(file, h.cfg.Upload.PresetsSubdir)
+		if err != nil {
+			writeError(c, apperrors.Wrap(err, 500, "UPLOAD_SAVE_FAILED", "cannot save preset image"))
+			return
+		}
 	}
-	if err := validation.UploadFile(file, h.cfg.Upload.AllowedExts, h.cfg.Upload.MaxBytes); err != nil {
-		writeError(c, err)
-		return
-	}
-	imageURL, err := h.storage.Save(file, h.cfg.Upload.PresetsSubdir)
-	if err != nil {
-		writeError(c, apperrors.Wrap(err, 500, "UPLOAD_SAVE_FAILED", "cannot save preset image"))
-		return
-	}
-	item, err := h.service.Create(preset.CreateInput{Name: name, Status: status, Note: note, Tags: cleanTags, ImageURL: imageURL, SortOrder: sortOrder})
+	item, err := h.service.Create(preset.CreateInput{Name: name, Status: status, Note: note, Tags: cleanTags, ImageURL: imageURL, FileID: fileID, ActorID: c.GetString("admin_id"), SortOrder: sortOrder})
 	if err != nil {
 		writeError(c, err)
 		return

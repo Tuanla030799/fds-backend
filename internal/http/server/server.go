@@ -31,9 +31,7 @@ func New(cfg *config.Config, logger *appLogger.Logger, jwtMiddleware gin.Handler
 	r.Use(middleware.AccessLogger(logger))
 	r.MaxMultipartMemory = cfg.Upload.MaxBytes
 	r.Use(cors.New(cors.Config{AllowOrigins: cfg.CORS.Origins, AllowMethods: []string{"GET", "POST", "PATCH", "DELETE", "OPTIONS"}, AllowHeaders: []string{"Origin", "Content-Type", "Accept", "Authorization", "X-Requested-With", "X-Request-ID"}, ExposeHeaders: []string{"Content-Length", "X-Request-ID"}, AllowCredentials: true, MaxAge: 12 * time.Hour}))
-	if cfg.Storage.Driver == "local" {
-		r.Static(cfg.Upload.PublicBasePath, cfg.Upload.Dir)
-	}
+	r.Static(cfg.Upload.PublicBasePath, cfg.Upload.Dir)
 	api := r.Group("/api")
 	admin := api.Group("/admin")
 	adminAuth := admin.Group("/auth")

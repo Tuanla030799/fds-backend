@@ -12,6 +12,7 @@ import (
 
 type Repository interface {
 	Create(item *Submission) error
+	CreateTx(tx *gorm.DB, item *Submission) error
 	List(filters query.Filters, sort query.Sort, params pagination.Params) ([]Submission, int64, error)
 	FindByID(id string) (*Submission, error)
 	Update(item *Submission) error
@@ -22,6 +23,9 @@ type GormRepository struct{ db *gorm.DB }
 
 func NewGormRepository(db *gorm.DB) *GormRepository     { return &GormRepository{db: db} }
 func (r *GormRepository) Create(item *Submission) error { return r.db.Create(item).Error }
+func (r *GormRepository) CreateTx(tx *gorm.DB, item *Submission) error {
+	return tx.Create(item).Error
+}
 func (r *GormRepository) List(filters query.Filters, sort query.Sort, params pagination.Params) ([]Submission, int64, error) {
 	var items []Submission
 	var total int64

@@ -56,3 +56,17 @@ func (s *LocalStorage) Save(file *multipart.FileHeader, folder string) (string, 
 	}
 	return strings.TrimRight(s.publicBase, "/") + "/" + folder + "/" + filename, nil
 }
+
+func (s *LocalStorage) Delete(path string) error {
+	trimmedBase := strings.TrimRight(s.publicBase, "/")
+	relativePath := strings.TrimPrefix(path, trimmedBase+"/")
+	relativePath = strings.TrimPrefix(relativePath, "/")
+	if relativePath == "" || relativePath == path {
+		return os.ErrNotExist
+	}
+	target := filepath.Join(s.root, filepath.FromSlash(relativePath))
+	if err := os.Remove(target); err != nil && !os.IsNotExist(err) {
+		return err
+	}
+	return nil
+}

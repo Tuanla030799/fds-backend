@@ -8,6 +8,7 @@ import (
 	"fds-backend/internal/domain/admin"
 	"fds-backend/internal/domain/auditlog"
 	"fds-backend/internal/domain/designsubmission"
+	"fds-backend/internal/domain/fileasset"
 	"fds-backend/internal/domain/preset"
 	"fds-backend/internal/domain/refreshtoken"
 	appLogger "fds-backend/internal/platform/logger"
@@ -36,7 +37,7 @@ func Connect(cfg *config.Config, logger *appLogger.Logger) (*gorm.DB, error) {
 }
 
 func Migrate(db *gorm.DB) error {
-	return db.AutoMigrate(&admin.User{}, &designsubmission.Submission{}, &preset.Preset{}, &auditlog.AuditLog{}, &refreshtoken.Token{})
+	return db.AutoMigrate(&admin.User{}, &designsubmission.Submission{}, &preset.Preset{}, &auditlog.AuditLog{}, &refreshtoken.Token{}, &fileasset.File{})
 }
 
 func Seed(db *gorm.DB, cfg *config.Config, logger *appLogger.Logger) error {

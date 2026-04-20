@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"strings"
+
 	"fds-backend/internal/config"
 	"fds-backend/internal/domain/auditlog"
 	"fds-backend/internal/domain/designsubmission"
@@ -26,21 +28,33 @@ func NewDesignSubmissionHandler(service *designsubmission.Service, st storage.St
 }
 
 func (h *DesignSubmissionHandler) Create(c *gin.Context) {
-	file, err := c.FormFile("image")
-	if err != nil {
-		writeError(c, apperrors.BadRequest("image is required"))
-		return
+	fileID := strings.TrimSpace(c.PostForm("fileId"))
+	imageURL := ""
+	if fileID == "" {
+		file, err := c.FormFile("image")
+		if err != nil {
+			writeError(c, apperrors.BadRequest("image or fileId is required"))
+			return
+		}
+		if err := validation.UploadFile(file, h.cfg.Upload.AllowedExts, h.cfg.Upload.MaxBytes); err != nil {
+			writeError(c, err)
+			return
+		}
+		imageURL, err = h.storage.Save(file, h.cfg.Upload.OrdersSubdir)
+		if err != nil {
+			writeError(c, apperrors.Wrap(err, 500, "UPLOAD_SAVE_FAILED", "cannot save image"))
+			return
+		}
 	}
-	if err := validation.UploadFile(file, h.cfg.Upload.AllowedExts, h.cfg.Upload.MaxBytes); err != nil {
-		writeError(c, err)
-		return
-	}
-	imageURL, err := h.storage.Save(file, h.cfg.Upload.OrdersSubdir)
-	if err != nil {
-		writeError(c, apperrors.Wrap(err, 500, "UPLOAD_SAVE_FAILED", "cannot save image"))
-		return
-	}
-	item, err := h.service.Create(designsubmission.CreateInput{FullName: c.PostForm("fullName"), Address: c.PostForm("address"), Phone: c.PostForm("phone"), Note: c.PostForm("note"), ImageURL: imageURL})
+	item, err := h.service.Create(designsubmission.CreateInput{
+		FullName: c.PostForm("fullName"),
+		Address:  c.PostForm("address"),
+		Phone:    c.PostForm("phone"),
+		Note:     c.PostForm("note"),
+		ImageURL: imageURL,
+		FileID:   fileID,
+		ActorID:  c.GetString("admin_id"),
+	})
 	if err != nil {
 		writeError(c, err)
 		return

@@ -12,6 +12,7 @@ import (
 
 type Repository interface {
 	Create(item *Preset) error
+	CreateTx(tx *gorm.DB, item *Preset) error
 	List(filters query.Filters, sort query.Sort, params pagination.Params) ([]Preset, int64, error)
 	Delete(id string) error
 }
@@ -20,6 +21,9 @@ type GormRepository struct{ db *gorm.DB }
 
 func NewGormRepository(db *gorm.DB) *GormRepository { return &GormRepository{db: db} }
 func (r *GormRepository) Create(item *Preset) error { return r.db.Create(item).Error }
+func (r *GormRepository) CreateTx(tx *gorm.DB, item *Preset) error {
+	return tx.Create(item).Error
+}
 func (r *GormRepository) List(filters query.Filters, sort query.Sort, params pagination.Params) ([]Preset, int64, error) {
 	var items []Preset
 	var total int64

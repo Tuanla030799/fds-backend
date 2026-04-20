@@ -1,8 +1,11 @@
 package designsubmissionmodule
 
 import (
+	"time"
+
 	"fds-backend/internal/domain/admin"
 	"fds-backend/internal/domain/designsubmission"
+	"fds-backend/internal/domain/fileasset"
 	"fds-backend/internal/http/handlers"
 	"fds-backend/internal/http/middleware"
 	"fds-backend/internal/modulekit"
@@ -15,7 +18,8 @@ func (m *Module) Name() string { return "design-submission" }
 
 func (m *Module) Register(reg *modulekit.Registry) error {
 	repo := designsubmission.NewGormRepository(reg.DB)
-	service := designsubmission.NewService(repo)
+	fileService := fileasset.NewService(fileasset.NewGormRepository(reg.DB), reg.Providers.Storage, 10*time.Minute)
+	service := designsubmission.NewService(repo, reg.DB, fileService)
 	h := handlers.NewDesignSubmissionHandler(
 		service,
 		reg.Providers.Storage,
@@ -23,7 +27,7 @@ func (m *Module) Register(reg *modulekit.Registry) error {
 		reg.Config,
 	)
 
-	reg.Public.POST("/design-submissions", h.Create)
+	reg.Public.POST("/design-submissions", middleware.NewOptionalJWTMiddleware(reg.Providers.JWTManager), h.Create)
 	reg.Admin.GET("/design-submissions", h.AdminList)
 	reg.Admin.PATCH(
 		"/design-submissions/:id/status",

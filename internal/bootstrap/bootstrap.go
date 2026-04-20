@@ -22,14 +22,9 @@ func BuildApplication() (*app.Application, error) {
 
 	logger := appLogger.New(cfg.App.Env)
 
-	var fileStorage storage.Storage
-	if cfg.Storage.Driver == "s3" {
-		fileStorage = storage.NewS3Storage()
-	} else {
-		fileStorage = storage.NewLocalStorage(cfg.Upload.Dir, cfg.Upload.PublicBasePath)
-	}
+	var fileStorage storage.Storage = storage.NewLocalStorage(cfg.Upload.Dir, cfg.Upload.PublicBasePath)
 
-	if err := fileStorage.EnsureDirs(cfg.Upload.OrdersSubdir, cfg.Upload.PresetsSubdir); err != nil {
+	if err := fileStorage.EnsureDirs(cfg.Upload.OrdersSubdir, cfg.Upload.PresetsSubdir, cfg.Upload.TempSubdir); err != nil {
 		return nil, err
 	}
 
