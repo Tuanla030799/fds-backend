@@ -20,9 +20,27 @@ Backend Golang cho FDS theo hướng mở rộng module, gồm 15 nhóm nền t�
 ## Run with Docker
 
 ```bash
-cp .env.example .env
+cp .env.server .env
 docker compose up --build
 ```
+
+## Local Development
+
+Chạy riêng database bằng Docker:
+
+```bash
+docker compose up -d db
+```
+
+Chạy API trên máy bằng `go run`:
+
+```bash
+go run ./cmd/api
+```
+
+Quy ước file:
+- `.env`: bản local để chạy `go run`, dùng `DATABASE_URL=...@localhost...`
+- `.env.server`: bản cho Docker/server, dùng `DATABASE_URL=...@db...`
 
 ## Main endpoints
 

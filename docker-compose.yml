@@ -18,7 +18,7 @@ services:
   api:
     build: .
     env_file:
-      - .env
+      - .env.server
     depends_on:
       db:
         condition: service_healthy

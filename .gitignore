@@ -1,0 +1,12 @@
+.codex
+.env
+tmp/
+dist/
+bin/
+*.log
+
+# Runtime data
+uploads/
+
+# Local editor / OS noise
+.DS_Store
