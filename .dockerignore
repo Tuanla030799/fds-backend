@@ -1,0 +1,8 @@
+.git
+.idea
+.gradle
+build
+springboot-backend/.gradle
+springboot-backend/build
+uploads
+*.log
