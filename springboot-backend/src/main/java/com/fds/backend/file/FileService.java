@@ -2,6 +2,7 @@ package com.fds.backend.file;
 
 import com.fds.backend.common.ApiException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -21,7 +22,11 @@ public class FileService {
         this.storage = storage;
     }
 
+    @Transactional
     public Map<String, String> upload(MultipartFile file, String folder) throws IOException {
+        if (file.isEmpty()) {
+            throw new ApiException("File is empty");
+        }
         if (!ALLOWED_FOLDERS.contains(folder)) {
             throw new ApiException("Invalid folder");
         }

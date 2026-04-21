@@ -1,6 +1,7 @@
 package com.fds.backend.preset;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -19,13 +20,19 @@ public class PresetService {
         return repository.list(status, keyword, safeLimit, offset);
     }
 
+    @Transactional
     public void create(PresetCreateRequest req) {
-        repository.create(UUID.randomUUID(), req.name(), req.status(), req.note(), req.tags(), req.imageUrl(), req.sortOrder());
+        String finalStatus = (req.status() == null || req.status().isBlank()) ? "active" : req.status();
+        String finalTags = (req.tags() == null || req.tags().isBlank()) ? "[]" : req.tags();
+        int finalSort = req.sortOrder() == null ? 0 : req.sortOrder();
+
+        repository.create(UUID.randomUUID(), req.name(), finalStatus, req.note(), finalTags, req.imageUrl(), finalSort);
     }
 
+    @Transactional
     public void delete(UUID id) {
         repository.delete(id);
     }
 
-    public record PresetCreateRequest(String name, String status, String note, String tags, String imageUrl, int sortOrder) {}
+    public record PresetCreateRequest(String name, String status, String note, String tags, String imageUrl, Integer sortOrder) {}
 }

@@ -19,4 +19,9 @@ public class GlobalExceptionHandler {
                 .map(err -> err.getField() + " " + err.getDefaultMessage()).orElse("Validation failed");
         return ResponseEntity.badRequest().body(new ApiResponse<>(false, msg, null));
     }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ApiResponse<Void>> handleUnexpected(Exception ex) {
+        return ResponseEntity.internalServerError().body(new ApiResponse<>(false, "Internal server error", null));
+    }
 }
