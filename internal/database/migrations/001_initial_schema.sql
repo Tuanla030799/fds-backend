@@ -1,2 +1,0 @@
--- production migration placeholder
--- create tables: admins, refresh_tokens, design_submissions, presets, audit_logs

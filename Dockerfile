@@ -1,14 +1,11 @@
-FROM golang:1.23-alpine AS builder
+FROM maven:3.9.10-eclipse-temurin-21 AS build
 WORKDIR /app
-COPY go.mod ./
-RUN go mod download
-COPY . .
-RUN CGO_ENABLED=0 GOOS=linux go build -o /fds-backend ./cmd/api
+COPY springboot-backend/pom.xml ./pom.xml
+COPY springboot-backend/src ./src
+RUN mvn -q -DskipTests package
 
-FROM alpine:3.20
+FROM eclipse-temurin:21-jre
 WORKDIR /app
-COPY --from=builder /fds-backend /app/fds-backend
-COPY .env.example /app/.env.example
-RUN mkdir -p /app/uploads/design-submissions /app/uploads/presets
+COPY --from=build /app/target/fds-backend-1.0.0.jar app.jar
 EXPOSE 8080
-CMD ["/app/fds-backend"]
+ENTRYPOINT ["java","-jar","/app/app.jar"]
