@@ -1,80 +1,59 @@
-# FDS Backend Modular
+# FDS Backend (Spring Boot + MyBatis)
 
-Backend Golang cho FDS theo hướng mở rộng module, gồm 15 nhóm nền tảng đã được thêm:
-1. validation chung
-2. config typed + fail-fast validate
-3. migration/autormigrate scaffold
-4. structured logger
-5. audit log admin actions
-6. refresh token
-7. RBAC role-based access
-8. soft delete
-9. search/filter/sort chuẩn
-10. storage abstraction
-11. OpenAPI/Swagger yaml
-12. tests scaffold
-13. seed data
-14. transaction helper
-15. rate limit + security headers
+Backend đã chuyển hoàn toàn sang Java 21 với Spring Boot, MyBatis và Flyway theo chuẩn tách lớp Spring:
+- `Controller` (HTTP)
+- `Service` (business/use-case)
+- `Repository` interface + `MyBatis...Repository` adapter (persistence)
 
-## Run with Docker
+## Công nghệ
+- Java 21
+- Spring Boot 3
+- MyBatis XML
+- Flyway
+- PostgreSQL
+- HikariCP
 
-```bash
-cp .env.server .env
-docker compose up --build
-```
+## Cấu hình
+Project dùng cấu hình chuẩn Spring Boot qua:
+- `springboot-backend/src/main/resources/application.properties` (mặc định/local)
+- `springboot-backend/src/main/resources/application-docker.properties` (khi chạy Docker)
 
-## Local Development
-
-Chạy riêng database bằng Docker:
-
+## Chạy local
+1. Chạy PostgreSQL:
 ```bash
 docker compose up -d db
 ```
-
-Chạy API trên máy bằng `go run`:
-
+2. Chạy API:
 ```bash
-go run ./cmd/api
+cd springboot-backend
+mvn spring-boot:run
 ```
 
-Quy ước file:
-- `.env`: bản local để chạy `go run`, dùng `DATABASE_URL=...@localhost...`
-- `.env.server`: bản cho Docker/server, dùng `DATABASE_URL=...@db...`
+## Chạy full bằng Docker
+```bash
+docker compose up --build
+```
+`docker-compose` set `SPRING_PROFILES_ACTIVE=docker` để dùng profile Docker.
 
-## Files Upload
-
-- `POST /api/files/upload`
-- `multipart/form-data` gồm `file` và `folder`
-- `folder` cho phép: `tmp`, `presets`, `design-submissions`
-- file mới tạo record trong bảng `files` với status `UNACTIVE`
-- mỗi user chỉ upload tối đa `20` ảnh/phút, riêng `super_admin` được bỏ qua limit
-- khi tạo preset hoặc design submission với `fileId`, backend sẽ đổi status file sang `ACTIVE`
-- cron job nền xóa file `UNACTIVE` quá `10` phút kể từ `created_at`
-
-## Main endpoints
-
+## Endpoint chính
+- `GET /api/health`
 - `POST /api/admin/auth/register`
 - `POST /api/admin/auth/login`
 - `POST /api/admin/auth/refresh`
 - `POST /api/admin/auth/logout`
 - `POST /api/design-submissions`
 - `GET /api/admin/design-submissions`
-- `PATCH /api/admin/design-submissions/:id/status`
-- `DELETE /api/admin/design-submissions/:id`
+- `PATCH /api/admin/design-submissions/{id}/status`
+- `DELETE /api/admin/design-submissions/{id}`
 - `GET /api/presets`
 - `GET /api/admin/presets`
 - `POST /api/admin/presets`
-- `DELETE /api/admin/presets/:id`
-- `GET /api/docs/openapi.yaml`
+- `DELETE /api/admin/presets/{id}`
+- `POST /api/files/upload`
 
-## Roles
-- `super_admin`: full access
-- `operator`: manage orders and presets
-- `viewer`: read only
+## Migration
+- `springboot-backend/src/main/resources/db/migration/V1__initial_schema.sql`
+- `springboot-backend/src/main/resources/db/migration/V2__seed_admin.sql`
 
-## Notes
-- Local storage chạy ngay được.
-- File hiện được lưu local qua `Storage` abstraction để sau này vẫn có thể thay backend lưu trữ khác nếu cần.
-- AutoMigrate đang bật để dev nhanh; production nên đổi sang migration runner riêng.
-# fds-backend
+## Tài liệu kiến trúc
+- `docs/ARCHITECTURE.md`
