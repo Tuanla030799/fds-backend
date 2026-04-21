@@ -1,6 +1,6 @@
 # FDS Backend (Java)
 
-Project đã chuyển toàn bộ backend sang **Spring Boot + MyBatis + PostgreSQL**.
+Project đã chuyển toàn bộ backend sang **Spring Boot + MyBatis + PostgreSQL** theo hướng thiết kế dễ mở rộng.
 
 ## Stack
 - Java 21
@@ -33,6 +33,9 @@ mvn spring-boot:run
 - `POST /api/admin/presets`
 - `DELETE /api/admin/presets/{id}`
 - `POST /api/files/upload`
+
+## Kiến trúc mở rộng
+Xem chi tiết tại `docs/ARCHITECTURE.md`.
 
 ## DB migration
 Flyway scripts nằm ở:

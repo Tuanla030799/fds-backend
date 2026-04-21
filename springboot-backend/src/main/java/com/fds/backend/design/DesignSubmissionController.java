@@ -11,15 +11,15 @@ import java.util.UUID;
 
 @RestController
 public class DesignSubmissionController {
-    private final DesignSubmissionMapper mapper;
+    private final DesignSubmissionService service;
 
-    public DesignSubmissionController(DesignSubmissionMapper mapper) {
-        this.mapper = mapper;
+    public DesignSubmissionController(DesignSubmissionService service) {
+        this.service = service;
     }
 
     @PostMapping("/api/design-submissions")
     public ApiResponse<Void> create(@RequestBody CreateBody body) {
-        mapper.create(UUID.randomUUID(), body.fullName, body.address, body.phone, body.note, body.imageUrl);
+        service.create(body.fullName, body.address, body.phone, body.note, body.imageUrl);
         return ApiResponse.ok("Created", null);
     }
 
@@ -28,20 +28,18 @@ public class DesignSubmissionController {
                                                      @RequestParam(required = false) String keyword,
                                                      @RequestParam(defaultValue = "1") @Min(1) int page,
                                                      @RequestParam(defaultValue = "20") @Min(1) @Max(100) int limit) {
-        int safeLimit = Math.min(Math.max(limit, 1), 100);
-        int offset = (Math.max(page, 1) - 1) * safeLimit;
-        return ApiResponse.ok("OK", mapper.list(status, keyword, safeLimit, offset));
+        return ApiResponse.ok("OK", service.list(status, keyword, page, limit));
     }
 
     @PatchMapping("/api/admin/design-submissions/{id}/status")
     public ApiResponse<Void> updateStatus(@PathVariable UUID id, @RequestBody UpdateStatusBody body) {
-        mapper.updateStatus(id, body.status);
+        service.updateStatus(id, body.status);
         return ApiResponse.ok("Updated", null);
     }
 
     @DeleteMapping("/api/admin/design-submissions/{id}")
     public ApiResponse<Void> delete(@PathVariable UUID id) {
-        mapper.delete(id);
+        service.delete(id);
         return ApiResponse.ok("Deleted", null);
     }
 

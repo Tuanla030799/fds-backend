@@ -7,24 +7,24 @@ import java.util.UUID;
 
 @Service
 public class PresetService {
-    private final PresetMapper presetMapper;
+    private final PresetRepository repository;
 
-    public PresetService(PresetMapper presetMapper) {
-        this.presetMapper = presetMapper;
+    public PresetService(PresetRepository repository) {
+        this.repository = repository;
     }
 
     public List<Preset> list(String status, String keyword, int page, int limit) {
         int safeLimit = Math.min(Math.max(limit, 1), 100);
         int offset = (Math.max(page, 1) - 1) * safeLimit;
-        return presetMapper.list(status, keyword, safeLimit, offset);
+        return repository.list(status, keyword, safeLimit, offset);
     }
 
     public void create(PresetCreateRequest req) {
-        presetMapper.create(UUID.randomUUID(), req.name(), req.status(), req.note(), req.tags(), req.imageUrl(), req.sortOrder());
+        repository.create(UUID.randomUUID(), req.name(), req.status(), req.note(), req.tags(), req.imageUrl(), req.sortOrder());
     }
 
     public void delete(UUID id) {
-        presetMapper.delete(id);
+        repository.delete(id);
     }
 
     public record PresetCreateRequest(String name, String status, String note, String tags, String imageUrl, int sortOrder) {}
