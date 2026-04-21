@@ -25,5 +25,5 @@ Khi thêm module mới (vd: `orders`), tạo theo skeleton:
 
 ## Cross-cutting
 - Exception envelope chung ở `common/*`.
-- Config runtime chung ở `application.yml`.
+- Config runtime chung ở `application.properties`.
 - Schema thay đổi qua Flyway để đảm bảo deploy repeatable.

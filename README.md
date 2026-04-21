@@ -1,22 +1,40 @@
-# FDS Backend (Java)
+# FDS Backend (Spring Boot + MyBatis)
 
-Project đã chuyển toàn bộ backend sang **Spring Boot + MyBatis + PostgreSQL** theo hướng thiết kế dễ mở rộng.
+Backend đã chuyển hoàn toàn sang Java 21 với Spring Boot, MyBatis và Flyway.
 
-## Stack
+## Công nghệ
 - Java 21
 - Spring Boot 3
 - MyBatis XML
-- Flyway migration
-- HikariCP tuning
-- JWT auth (access/refresh)
+- Flyway
+- PostgreSQL
+- HikariCP
+
+## Cấu hình
+Project dùng cấu hình chuẩn Spring Boot qua:
+- `springboot-backend/src/main/resources/application.properties` (mặc định/local)
+- `springboot-backend/src/main/resources/application-docker.properties` (khi chạy Docker)
+
+> Không còn dùng `.env.server` / `.env.example` cho app config.
 
 ## Chạy local
+1. Chạy PostgreSQL:
 ```bash
-cp .env.server .env
 docker compose up -d db
+```
+2. Chạy API:
+```bash
 cd springboot-backend
 mvn spring-boot:run
 ```
+
+Mặc định API chạy tại: `http://localhost:8080`.
+
+## Chạy full bằng Docker
+```bash
+docker compose up --build
+```
+Docker compose tự set `SPRING_PROFILES_ACTIVE=docker` để dùng `application-docker.properties`.
 
 ## Endpoint chính
 - `GET /api/health`
@@ -34,14 +52,9 @@ mvn spring-boot:run
 - `DELETE /api/admin/presets/{id}`
 - `POST /api/files/upload`
 
-## Kiến trúc mở rộng
-Xem chi tiết tại `docs/ARCHITECTURE.md`.
-
-## DB migration
-Flyway scripts nằm ở:
+## CSDL migration
 - `springboot-backend/src/main/resources/db/migration/V1__initial_schema.sql`
 - `springboot-backend/src/main/resources/db/migration/V2__seed_admin.sql`
 
-Tài khoản seed mặc định:
-- email: `admin@fds.local`
-- password: `admin123`
+## Kiến trúc mở rộng
+- Tài liệu: `docs/ARCHITECTURE.md`
