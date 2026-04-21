@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="com.fds.backend.preset.PresetServiceTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-04-21T08:00:12" hostname="0541c8d59f4f" time="0.029">
-  <properties/>
-  <testcase name="createShouldApplyDefaults()" classname="com.fds.backend.preset.PresetServiceTest" time="0.029"/>
-  <system-out><![CDATA[]]></system-out>
-  <system-err><![CDATA[]]></system-err>
-</testsuite>
