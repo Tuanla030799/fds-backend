@@ -15,8 +15,8 @@ Backend đã chuyển hoàn toàn sang Java 21 với Spring Boot, MyBatis và Fl
 
 ## Cấu hình
 Project dùng cấu hình chuẩn Spring Boot qua:
-- `springboot-backend/src/main/resources/application.properties` (mặc định/local)
-- `springboot-backend/src/main/resources/application-docker.properties` (khi chạy Docker)
+- `src/main/resources/application.properties` (mặc định/local)
+- `src/main/resources/application-docker.properties` (khi chạy Docker)
 
 ## Chạy local
 1. Chạy PostgreSQL:
@@ -25,8 +25,12 @@ docker compose up -d db
 ```
 2. Chạy API:
 ```bash
-cd springboot-backend
-mvn spring-boot:run
+./gradlew bootRun
+```
+
+## Build bằng Gradle
+```bash
+./gradlew clean bootJar
 ```
 
 ## Chạy full bằng Docker
@@ -52,8 +56,8 @@ docker compose up --build
 - `POST /api/files/upload`
 
 ## Migration
-- `springboot-backend/src/main/resources/db/migration/V1__initial_schema.sql`
-- `springboot-backend/src/main/resources/db/migration/V2__seed_admin.sql`
+- `src/main/resources/db/migration/V1__initial_schema.sql`
+- `src/main/resources/db/migration/V2__seed_admin.sql`
 
 ## Tài liệu kiến trúc
 - `docs/ARCHITECTURE.md`
