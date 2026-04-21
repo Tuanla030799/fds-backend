@@ -78,3 +78,11 @@ Quy ước file:
 - File hiện được lưu local qua `Storage` abstraction để sau này vẫn có thể thay backend lưu trữ khác nếu cần.
 - AutoMigrate đang bật để dev nhanh; production nên đổi sang migration runner riêng.
 # fds-backend
+
+## Spring Boot + MyBatis migration scaffold
+
+Đã thêm skeleton tại `springboot-backend/` để bắt đầu chuyển đổi dần từ Go sang Spring Boot + MyBatis.
+
+- Tài liệu kế hoạch: `docs/springboot-mybatis-migration.md`
+- Endpoint mẫu: `GET /api/v2/presets`
+- SQL động + pagination + `COUNT(*) OVER()` đã có sẵn trong mapper XML.
