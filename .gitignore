@@ -5,8 +5,16 @@ dist/
 bin/
 *.log
 
+# Gradle
+.gradle/
+build/
+springboot-backend/.gradle/
+springboot-backend/build/
+
 # Runtime data
 uploads/
 
 # Local editor / OS noise
+.idea/
+*.iml
 .DS_Store
