@@ -2,6 +2,8 @@ package com.fds.backend.file;
 
 import com.fds.backend.auth.CurrentAdmin;
 import com.fds.backend.common.ApiException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,6 +16,7 @@ import java.util.UUID;
 
 @Service
 public class FileService {
+    private static final Logger log = LoggerFactory.getLogger(FileService.class);
     private static final String STATUS_INACTIVE = "INACTIVE";
 
     private final FileAssetRepository repository;
@@ -37,6 +40,7 @@ public class FileService {
         String relativePath = storage.save(file);
         UUID id = UUID.randomUUID();
         repository.create(id, relativePath, STATUS_INACTIVE, currentAdmin.idOrNull());
+        log.info("File uploaded fileId={} path={} status={}", id, relativePath, STATUS_INACTIVE);
         return Map.of("fileId", id.toString(), "path", relativePath, "url", fileUrlService.publicUrl(relativePath));
     }
 

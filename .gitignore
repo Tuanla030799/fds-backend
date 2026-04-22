@@ -4,6 +4,7 @@ tmp/
 dist/
 bin/
 *.log
+logs/
 
 # Gradle
 .gradle/

@@ -33,6 +33,39 @@ docker compose up -d db
 ./gradlew clean bootJar
 ```
 
+## Logging
+- Log ghi ra console và rolling file qua Logback.
+- Local: `./logs/fds-backend.log`
+- Docker/server: `/app/logs/fds-backend.log`
+- Khi chạy bằng Docker Compose, thư mục này được mount ra host tại `./logs`.
+- File rolling theo ngày và dung lượng: `logs/archive/fds-backend.yyyy-MM-dd.i.log.gz`
+- Mức log mặc định: `root=INFO`, `com.fds.backend=INFO`, `org.springframework=INFO`, `org.mybatis=INFO`.
+- Mỗi HTTP request được log dạng `METHOD /path -> status (duration ms)`.
+
+Tail log local:
+```bash
+tail -f logs/fds-backend.log
+```
+
+Tail log trên server/container:
+```bash
+docker compose exec api tail -f /app/logs/fds-backend.log
+```
+
+Hoặc tail trực tiếp trên host server:
+```bash
+tail -f logs/fds-backend.log
+```
+
+## CORS
+- Local mặc định cho phép frontend từ `http://localhost:3000`, `http://localhost:5173`, `http://127.0.0.1:3000`, `http://127.0.0.1:5173`.
+- Docker/server cấu hình bằng biến môi trường `APP_CORS_ALLOWED_ORIGINS`, phân tách nhiều origin bằng dấu phẩy.
+
+Ví dụ:
+```bash
+APP_CORS_ALLOWED_ORIGINS=https://admin.example.com,https://www.example.com docker compose up -d
+```
+
 ## Chạy full bằng Docker
 ```bash
 docker compose up --build
