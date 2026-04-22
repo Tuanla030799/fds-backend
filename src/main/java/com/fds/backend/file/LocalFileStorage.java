@@ -21,13 +21,16 @@ public class LocalFileStorage implements FileStorage {
 
     public LocalFileStorage(@Value("${app.upload-dir}") String uploadDir) {
         this.uploadRoot = Path.of(uploadDir);
+        log.info("File upload root configured path={}", this.uploadRoot.toAbsolutePath().normalize());
     }
 
     @Override
     public String save(MultipartFile file) throws IOException {
         String dateFolder = LocalDate.now().toString();
         Path targetDir = uploadRoot.resolve(dateFolder);
-        Files.createDirectories(targetDir);
+        if (Files.notExists(targetDir)) {
+            Files.createDirectories(targetDir);
+        }
         String clean = StringUtils.cleanPath(file.getOriginalFilename());
         String name = UUID.randomUUID() + "-" + clean;
         Path target = targetDir.resolve(name);
