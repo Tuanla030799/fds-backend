@@ -12,6 +12,6 @@ public interface PresetMapper {
                       @Param("limit") int limit, @Param("offset") int offset);
     void create(@Param("id") UUID id, @Param("name") String name, @Param("status") String status,
                 @Param("note") String note, @Param("tags") String tags, @Param("imageUrl") String imageUrl,
-                @Param("sortOrder") int sortOrder);
-    void delete(@Param("id") UUID id);
+                @Param("sortOrder") int sortOrder, @Param("createdBy") UUID createdBy);
+    void delete(@Param("id") UUID id, @Param("updatedBy") UUID updatedBy);
 }

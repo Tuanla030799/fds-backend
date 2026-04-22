@@ -8,6 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.LocalDate;
 import java.util.UUID;
 
 @Component
@@ -19,12 +20,23 @@ public class LocalFileStorage implements FileStorage {
     }
 
     @Override
-    public String save(MultipartFile file, String folder) throws IOException {
-        Files.createDirectories(uploadRoot.resolve(folder));
+    public String save(MultipartFile file) throws IOException {
+        String dateFolder = LocalDate.now().toString();
+        Path targetDir = uploadRoot.resolve(dateFolder);
+        Files.createDirectories(targetDir);
         String clean = StringUtils.cleanPath(file.getOriginalFilename());
         String name = UUID.randomUUID() + "-" + clean;
-        Path target = uploadRoot.resolve(folder).resolve(name);
+        Path target = targetDir.resolve(name);
         Files.write(target, file.getBytes());
-        return folder + "/" + name;
+        return dateFolder + "/" + name;
+    }
+
+    @Override
+    public void delete(String relativePath) throws IOException {
+        Path target = uploadRoot.resolve(relativePath).normalize();
+        if (!target.startsWith(uploadRoot.normalize())) {
+            return;
+        }
+        Files.deleteIfExists(target);
     }
 }

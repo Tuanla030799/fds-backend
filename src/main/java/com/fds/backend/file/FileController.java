@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/files")
+@RequestMapping("/api")
 public class FileController {
     private final FileService fileService;
 
@@ -20,9 +20,13 @@ public class FileController {
         this.fileService = fileService;
     }
 
-    @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ApiResponse<Map<String, String>> upload(@RequestParam("file") MultipartFile file,
-                                                    @RequestParam("folder") String folder) throws IOException {
-        return ApiResponse.ok("Uploaded", fileService.upload(file, folder));
+    @PostMapping(value = "/files/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ApiResponse<Map<String, String>> upload(@RequestParam("file") MultipartFile file) throws IOException {
+        return ApiResponse.ok("Uploaded", fileService.upload(file));
+    }
+
+    @PostMapping(value = "/admin/files/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ApiResponse<Map<String, String>> uploadAdmin(@RequestParam("file") MultipartFile file) throws IOException {
+        return ApiResponse.ok("Uploaded", fileService.upload(file));
     }
 }

@@ -2,8 +2,9 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.fds.backend.design.DesignSubmissionMapper">
     <insert id="create">
-        INSERT INTO design_submissions(id, full_name, address, phone, note, image_url, status)
-        VALUES(#{id}, #{fullName}, #{address}, #{phone}, #{note}, #{imageUrl}, 'pending_confirmation')
+        INSERT INTO design_submissions(id, full_name, address, phone, note, image_url, status, created_by, updated_by)
+        VALUES(#{id}, #{fullName}, #{address}, #{phone}, #{note}, #{imageUrl}, 'pending_confirmation',
+               #{createdBy}, #{createdBy})
     </insert>
 
     <select id="list" resultType="com.fds.backend.design.DesignSubmission">
@@ -21,10 +22,10 @@
     </select>
 
     <update id="updateStatus">
-        UPDATE design_submissions SET status = #{status}, updated_at = now() WHERE id = #{id}
+        UPDATE design_submissions SET status = #{status}, updated_by = #{updatedBy} WHERE id = #{id}
     </update>
 
     <update id="delete">
-        UPDATE design_submissions SET deleted_at = now() WHERE id = #{id}
+        UPDATE design_submissions SET deleted_at = now(), updated_by = #{updatedBy} WHERE id = #{id}
     </update>
 </mapper>

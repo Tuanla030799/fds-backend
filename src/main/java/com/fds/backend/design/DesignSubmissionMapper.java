@@ -9,9 +9,10 @@ import java.util.UUID;
 @Mapper
 public interface DesignSubmissionMapper {
     void create(@Param("id") UUID id, @Param("fullName") String fullName, @Param("address") String address,
-                @Param("phone") String phone, @Param("note") String note, @Param("imageUrl") String imageUrl);
+                @Param("phone") String phone, @Param("note") String note, @Param("imageUrl") String imageUrl,
+                @Param("createdBy") UUID createdBy);
     List<DesignSubmission> list(@Param("status") String status, @Param("keyword") String keyword,
                                 @Param("limit") int limit, @Param("offset") int offset);
-    void updateStatus(@Param("id") UUID id, @Param("status") String status);
-    void delete(@Param("id") UUID id);
+    void updateStatus(@Param("id") UUID id, @Param("status") String status, @Param("updatedBy") UUID updatedBy);
+    void delete(@Param("id") UUID id, @Param("updatedBy") UUID updatedBy);
 }

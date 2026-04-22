@@ -19,12 +19,13 @@ public class MyBatisPresetRepository implements PresetRepository {
     }
 
     @Override
-    public void create(UUID id, String name, String status, String note, String tags, String imageUrl, int sortOrder) {
-        mapper.create(id, name, status, note, tags, imageUrl, sortOrder);
+    public void create(UUID id, String name, String status, String note, String tags, String imageUrl, int sortOrder,
+                       UUID createdBy) {
+        mapper.create(id, name, status, note, tags, imageUrl, sortOrder, createdBy);
     }
 
     @Override
-    public void delete(UUID id) {
-        mapper.delete(id);
+    public void delete(UUID id, UUID updatedBy) {
+        mapper.delete(id, updatedBy);
     }
 }

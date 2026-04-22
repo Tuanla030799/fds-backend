@@ -2,6 +2,8 @@ package com.fds.backend.file;
 
 import org.springframework.stereotype.Repository;
 
+import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Repository
@@ -13,7 +15,27 @@ public class MyBatisFileAssetRepository implements FileAssetRepository {
     }
 
     @Override
-    public void create(UUID id, String path, String folder, String status) {
-        mapper.create(id, path, folder, status);
+    public void create(UUID id, String path, String status, UUID createdBy) {
+        mapper.create(id, path, status, createdBy);
+    }
+
+    @Override
+    public FileAsset findById(UUID id) {
+        return mapper.findById(id);
+    }
+
+    @Override
+    public void updateStatus(UUID id, String status, UUID updatedBy) {
+        mapper.updateStatus(id, status, updatedBy);
+    }
+
+    @Override
+    public List<FileAsset> listInactiveCreatedBefore(OffsetDateTime cutoff) {
+        return mapper.listInactiveCreatedBefore(cutoff);
+    }
+
+    @Override
+    public void deleteById(UUID id) {
+        mapper.deleteById(id);
     }
 }

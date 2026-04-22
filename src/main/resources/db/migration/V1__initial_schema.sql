@@ -51,7 +51,6 @@ CREATE INDEX IF NOT EXISTS idx_presets_status_sort_created_at ON presets(status,
 CREATE TABLE IF NOT EXISTS files (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     path TEXT NOT NULL,
-    folder VARCHAR(60) NOT NULL,
     status VARCHAR(20) NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );

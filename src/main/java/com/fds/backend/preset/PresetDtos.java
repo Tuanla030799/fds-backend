@@ -1,6 +1,9 @@
 package com.fds.backend.preset;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
+import java.util.UUID;
 
 public class PresetDtos {
     public record CreateRequest(
@@ -8,7 +11,7 @@ public class PresetDtos {
             String status,
             String note,
             String tags,
-            @NotBlank String imageUrl,
+            @NotNull UUID fileId,
             Integer sortOrder
     ) {}
 }

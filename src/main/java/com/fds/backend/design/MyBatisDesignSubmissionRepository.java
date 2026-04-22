@@ -14,8 +14,9 @@ public class MyBatisDesignSubmissionRepository implements DesignSubmissionReposi
     }
 
     @Override
-    public void create(UUID id, String fullName, String address, String phone, String note, String imageUrl) {
-        mapper.create(id, fullName, address, phone, note, imageUrl);
+    public void create(UUID id, String fullName, String address, String phone, String note, String imageUrl,
+                       UUID createdBy) {
+        mapper.create(id, fullName, address, phone, note, imageUrl, createdBy);
     }
 
     @Override
@@ -24,12 +25,12 @@ public class MyBatisDesignSubmissionRepository implements DesignSubmissionReposi
     }
 
     @Override
-    public void updateStatus(UUID id, String status) {
-        mapper.updateStatus(id, status);
+    public void updateStatus(UUID id, String status, UUID updatedBy) {
+        mapper.updateStatus(id, status, updatedBy);
     }
 
     @Override
-    public void delete(UUID id) {
-        mapper.delete(id);
+    public void delete(UUID id, UUID updatedBy) {
+        mapper.delete(id, updatedBy);
     }
 }

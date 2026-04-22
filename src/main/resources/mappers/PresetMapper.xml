@@ -16,11 +16,12 @@
     </select>
 
     <insert id="create">
-        INSERT INTO presets(id, name, status, note, tags, image_url, sort_order)
-        VALUES(#{id}, #{name}, #{status}, #{note}, CAST(#{tags} AS jsonb), #{imageUrl}, #{sortOrder})
+        INSERT INTO presets(id, name, status, note, tags, image_url, sort_order, created_by, updated_by)
+        VALUES(#{id}, #{name}, #{status}, #{note}, CAST(#{tags} AS jsonb), #{imageUrl}, #{sortOrder},
+               #{createdBy}, #{createdBy})
     </insert>
 
     <update id="delete">
-        UPDATE presets SET deleted_at = now() WHERE id = #{id}
+        UPDATE presets SET deleted_at = now(), updated_by = #{updatedBy} WHERE id = #{id}
     </update>
 </mapper>

@@ -41,7 +41,7 @@ public class PresetController {
                 body.status(),
                 body.note(),
                 body.tags(),
-                body.imageUrl(),
+                body.fileId(),
                 body.sortOrder()
         ));
         return ApiResponse.ok("Created", null);

@@ -19,13 +19,14 @@ services:
     build: .
     environment:
       SPRING_PROFILES_ACTIVE: docker
+      APP_CDN_BASE_URL: ${APP_CDN_BASE_URL:-/files}
     depends_on:
       db:
         condition: service_healthy
     ports:
       - "8080:8080"
     volumes:
-      - ./storage:/app/storage
+      - ./uploads:/app/uploads
 
 volumes:
   postgres_data:
