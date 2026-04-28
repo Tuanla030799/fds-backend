@@ -20,7 +20,7 @@ public class DesignSubmissionController {
 
     @PostMapping("/design-submissions")
     public ApiResponse<Void> create(@Valid @RequestBody DesignSubmissionDtos.CreateRequest body) {
-        service.create(body.fullName(), body.address(), body.phone(), body.note(), body.imageUrl());
+        service.create(body.fullName(), body.address(), body.phone(), body.note(), body.fileId());
         return ApiResponse.ok("Created", null);
     }
 

@@ -14,9 +14,14 @@ public class MyBatisDesignSubmissionRepository implements DesignSubmissionReposi
     }
 
     @Override
-    public void create(UUID id, String fullName, String address, String phone, String note, String imageUrl,
+    public void create(UUID id, String fullName, String address, String phone, String note, UUID fileId,
                        UUID createdBy) {
-        mapper.create(id, fullName, address, phone, note, imageUrl, createdBy);
+        mapper.create(id, fullName, address, phone, note, fileId, createdBy);
+    }
+
+    @Override
+    public DesignSubmission findById(UUID id) {
+        return mapper.findById(id);
     }
 
     @Override

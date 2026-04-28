@@ -2,23 +2,32 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.fds.backend.design.DesignSubmissionMapper">
     <insert id="create">
-        INSERT INTO design_submissions(id, full_name, address, phone, note, image_url, status, created_by, updated_by)
-        VALUES(#{id}, #{fullName}, #{address}, #{phone}, #{note}, #{imageUrl}, 'pending_confirmation',
+        INSERT INTO design_submissions(id, full_name, address, phone, note, file_id, status, created_by, updated_by)
+        VALUES(#{id}, #{fullName}, #{address}, #{phone}, #{note}, #{fileId}, 'pending_confirmation',
                #{createdBy}, #{createdBy})
     </insert>
 
     <select id="list" resultType="com.fds.backend.design.DesignSubmission">
-        SELECT id, full_name, address, phone, note, image_url, status, created_at
-        FROM design_submissions
+        SELECT d.id, d.full_name, d.address, d.phone, d.note, d.file_id, f.path AS image_url, d.status, d.created_at
+        FROM design_submissions d
+        LEFT JOIN files f ON f.id = d.file_id
         <where>
-            deleted_at IS NULL
+            d.deleted_at IS NULL
             <if test="status != null and status != ''">AND status = #{status}</if>
             <if test="keyword != null and keyword != ''">
-                AND (full_name ILIKE CONCAT('%', #{keyword}, '%') OR phone ILIKE CONCAT('%', #{keyword}, '%'))
+                AND (d.full_name ILIKE CONCAT('%', #{keyword}, '%') OR d.phone ILIKE CONCAT('%', #{keyword}, '%'))
             </if>
         </where>
-        ORDER BY created_at DESC
+        ORDER BY d.created_at DESC
         LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <select id="findById" resultType="com.fds.backend.design.DesignSubmission">
+        SELECT d.id, d.full_name, d.address, d.phone, d.note, d.file_id, f.path AS image_url, d.status, d.created_at
+        FROM design_submissions d
+        LEFT JOIN files f ON f.id = d.file_id
+        WHERE d.id = #{id}
+          AND d.deleted_at IS NULL
     </select>
 
     <update id="updateStatus">
@@ -26,6 +35,8 @@
     </update>
 
     <update id="delete">
-        UPDATE design_submissions SET deleted_at = now(), updated_by = #{updatedBy} WHERE id = #{id}
+        UPDATE design_submissions
+        SET deleted_at = now(), file_id = NULL, updated_by = #{updatedBy}
+        WHERE id = #{id}
     </update>
 </mapper>
